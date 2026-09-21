@@ -14,6 +14,7 @@ class AgentGraphState(TypedDict):
     raw_user_query: str
     user_intent: str  # e.g., "BUDGET_OPTIMIZATION", "AUDIT_EXPERIMENT", "FALLACY_CHECK", "CALIBRATION"
     target_channels: List[str]
+    extracted_parameters: Optional[Dict[str, Any]]
     
     # Intermediate tool outputs
     detected_fallacies: List[Dict[str, Any]]
