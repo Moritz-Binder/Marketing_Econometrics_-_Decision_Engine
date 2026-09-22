@@ -78,7 +78,7 @@ def audit_experiment(
         
         # 3. Assemble Verdict
         srm_detected = srm_result["srm_detected"]
-        is_powered = power_result["is_adequately_powered"]
+        is_powered = not power_result["is_underpowered"]
         
         if srm_detected:
             verdict = f"INVALID TEST: Severe Sample Ratio Mismatch detected (p={srm_result['p_value']:.4f}). Do not use these results."
