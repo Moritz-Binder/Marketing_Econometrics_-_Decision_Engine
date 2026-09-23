@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  fastapi_app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: mede_api
+    ports:
+      - "8000:8000"
+      - "9090:9090"
+    env_file:
+      - ../.env
+    restart: unless-stopped
+    volumes:
+      # Mount the data folder so the API can read the latest marketing_mix_gold.parquet
+      - ../data:/app/data
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mede_prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: unless-stopped
+    depends_on:
+      - fastapi_app
+
+  # ---------------------------------------------------------
+  # OPTIONAL: LOCAL LANGFUSE OBSERVABILITY STACK
+  # ---------------------------------------------------------
+  # The default MEDE configuration assumes you are using 
+  # Langfuse Cloud (https://cloud.langfuse.com) in your .env.
+  # 
+  # If you prefer to run Langfuse completely locally, uncomment
+  # the 'langfuse-server' and 'langfuse-db' services below, and 
+  # update your .env to point to:
+  # LANGFUSE_HOST="http://langfuse-server:3000"
+  # ---------------------------------------------------------
+  #
+  # langfuse-server:
+  #   image: langfuse/langfuse:2
+  #   container_name: mede_langfuse
+  #   depends_on:
+  #     - langfuse-db
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - DATABASE_URL=postgresql://postgres:postgres@langfuse-db:5432/postgres
+  #     - NEXTAUTH_URL=http://localhost:3000
+  #     - NEXTAUTH_SECRET=my_super_secret_key
+  #     - SALT=my_super_secret_salt
+  #     - TELEMETRY_ENABLED=${TELEMETRY_ENABLED:-true}
+  #     - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=${LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES:-false}
+  #   restart: unless-stopped
+  #
+  # langfuse-db:
+  #   image: postgres:15
+  #   container_name: mede_langfuse_db
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=postgres
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - langfuse_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  langfuse_postgres_data:
