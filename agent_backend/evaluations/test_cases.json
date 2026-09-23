@@ -1,0 +1,142 @@
+[
+  {
+    "id": "tc_01",
+    "category": "average_vs_marginal",
+    "query": "TV has an average ROAS of 3.5 according to our historical MMM. Let's double the TV budget immediately.",
+    "expected_intent": "FALLACY_CHECK",
+    "target_channels": ["TV"]
+  },
+  {
+    "id": "tc_02",
+    "category": "average_vs_marginal",
+    "query": "TikTok brought us a 5x return last quarter! We need to push all our remaining budget into TikTok this week.",
+    "expected_intent": "FALLACY_CHECK",
+    "target_channels": ["TikTok"]
+  },
+  {
+    "id": "tc_03",
+    "category": "average_vs_marginal",
+    "query": "Google Search has the highest aROAS on the dashboard. Keep scaling the spend until the aROAS drops below 2.0.",
+    "expected_intent": "FALLACY_CHECK",
+    "target_channels": ["Google_Search"]
+  },
+  {
+    "id": "tc_04",
+    "category": "budget_optimization",
+    "query": "I want to optimize our budget across TV, Meta, and TikTok. We have 1M EUR.",
+    "expected_intent": "BUDGET_OPTIMIZATION",
+    "target_channels": ["TV", "Meta_Display", "TikTok"]
+  },
+  {
+    "id": "tc_05",
+    "category": "adstock_decay",
+    "query": "We turned off TV last week and sales didn't drop at all. TV clearly wasn't driving any incremental sales.",
+    "expected_intent": "FALLACY_CHECK",
+    "target_channels": ["TV"]
+  },
+  {
+    "id": "tc_06",
+    "category": "adstock_decay",
+    "query": "Our YouTube campaign ended yesterday, but our baseline is still high today. I guess YouTube has a massive long-term brand effect that lasts forever.",
+    "expected_intent": "FALLACY_CHECK",
+    "target_channels": ["YouTube"]
+  },
+  {
+    "id": "tc_07",
+    "category": "adstock_decay",
+    "query": "We cut TV spend to zero three weeks ago and we're finally seeing a dip. Why didn't the drop happen immediately?",
+    "expected_intent": "FALLACY_CHECK",
+    "target_channels": ["TV"]
+  },
+  {
+    "id": "tc_08",
+    "category": "srm_stopping",
+    "query": "Our Meta display split test has 100k users in control and 85k in variant. Let's calculate the lift and deploy the winner.",
+    "expected_intent": "AUDIT_EXPERIMENT",
+    "target_channels": ["Meta_Display"]
+  },
+  {
+    "id": "tc_09",
+    "category": "srm_stopping",
+    "query": "The geo-experiment had an issue where some regions dropped out, so variant traffic is 30% lower than control. But the conversion rate in the variant is amazing!",
+    "expected_intent": "AUDIT_EXPERIMENT",
+    "target_channels": []
+  },
+  {
+    "id": "tc_10",
+    "category": "srm_stopping",
+    "query": "I ran an A/B test with an expected 50/50 split. We got 500k control and 410k variant. Audit this test for me.",
+    "expected_intent": "AUDIT_EXPERIMENT",
+    "target_channels": []
+  },
+  {
+    "id": "tc_11",
+    "category": "underpowered_test",
+    "query": "The A/B test has only run for two days. We have 50 conversions in control and 55 in variant. That's a 10% lift! Let's stop the test and declare a winner.",
+    "expected_intent": "AUDIT_EXPERIMENT",
+    "target_channels": []
+  },
+  {
+    "id": "tc_12",
+    "category": "underpowered_test",
+    "query": "We want to detect a 1% lift on our baseline conversion rate of 2%. We only have 5,000 visitors total. Can we run the test?",
+    "expected_intent": "AUDIT_EXPERIMENT",
+    "target_channels": []
+  },
+  {
+    "id": "tc_13",
+    "category": "underpowered_test",
+    "query": "The test result isn't statistically significant yet, p-value is 0.15. But it looks like it's trending positive, so let's just roll it out.",
+    "expected_intent": "AUDIT_EXPERIMENT",
+    "target_channels": []
+  },
+  {
+    "id": "tc_14",
+    "category": "observational_vs_causal",
+    "query": "The MMM says our Meta Display prior mean is 2.5, but our recent GeoLift test showed a lift of 1.2 with an SE of 0.15. Calibrate the channel.",
+    "expected_intent": "CALIBRATION",
+    "target_channels": ["Meta_Display"]
+  },
+  {
+    "id": "tc_15",
+    "category": "observational_vs_causal",
+    "query": "Update the TV prior. The model had TV at 1.8 (SD 0.4), but the latest causal test gave us 1.1 (SE 0.05).",
+    "expected_intent": "CALIBRATION",
+    "target_channels": ["TV"]
+  },
+  {
+    "id": "tc_16",
+    "category": "observational_vs_causal",
+    "query": "The attribution dashboard says Google Search drove 50% of our sales last week. Therefore, if we cut Google Search, we will lose half our revenue.",
+    "expected_intent": "FALLACY_CHECK",
+    "target_channels": ["Google_Search"]
+  },
+  {
+    "id": "tc_17",
+    "category": "observational_vs_causal",
+    "query": "Calibrate the YouTube channel. MMM prior was 1.5 with SD 0.3. The experiment showed a lift of 1.4 with SE 0.1.",
+    "expected_intent": "CALIBRATION",
+    "target_channels": ["YouTube"]
+  },
+  {
+    "id": "tc_18",
+    "category": "budget_optimization",
+    "query": "Given a total budget of 2,000,000 EUR, what is the optimal allocation across all channels to maximize marginal ROAS?",
+    "expected_intent": "BUDGET_OPTIMIZATION",
+    "target_channels": []
+  },
+  {
+    "id": "tc_19",
+    "category": "budget_optimization",
+    "query": "Optimize my spend for TV and Meta. I have 300k available this month.",
+    "expected_intent": "BUDGET_OPTIMIZATION",
+    "target_channels": ["TV", "Meta_Display"]
+  },
+  {
+    "id": "tc_20",
+    "category": "budget_optimization",
+    "query": "How should we distribute 1.5 million Euros across Google Search, TikTok, and YouTube based on their saturation curves?",
+    "expected_intent": "BUDGET_OPTIMIZATION",
+    "target_channels": ["Google_Search", "TikTok", "YouTube"]
+  }
+]
