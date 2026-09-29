@@ -34,10 +34,10 @@ class SupervisorNode:
 Your job is to analyze a senior marketing stakeholder's query and route it to the correct deterministic analytical engine.
 
 Intents:
-- BUDGET_OPTIMIZATION: The user wants to allocate budget, maximize ROI, or evaluate the impact of shifting spend.
-- AUDIT_EXPERIMENT: The user has run an A/B test or Geo-experiment and wants to audit it for SRM, power, or validity.
-- FALLACY_CHECK: The user is making a high-risk claim (e.g. cutting a channel completely) and needs a rigorous fallacy check on their reasoning.
-- CALIBRATION: The user wants to update their MMM priors based on an experimental lift estimate.
+- BUDGET_OPTIMIZATION: The user explicitly asks to allocate budget, run the optimizer, maximize ROI, or calculate optimal spend across channels.
+- AUDIT_EXPERIMENT: The user mentions an A/B test, Geo-test, or experiment and discusses stopping it early, sample sizes, p-values, or test validity. ALL questions regarding experiments, A/B testing, or sample sizes MUST be routed here, even if the user is making a flawed claim about the test.
+- FALLACY_CHECK: The user is making a dangerous claim about standard marketing metrics, such as pausing a channel due to lack of immediate drop (adstock blindness) or scaling spend purely based on historical Average ROAS (aROAS vs mROAS). If they are misinterpreting a dashboard metric to justify spend changes (not an A/B test), route here.
+- CALIBRATION: The user wants to update their MMM priors or bayesian models based on an experimental lift estimate.
 
 Extract the intent and any specific channels mentioned."""
 
@@ -57,12 +57,21 @@ Extract the intent and any specific channels mentioned."""
         # Invoke the structured LLM
         routing_result: SupervisorIntentRouting = self.llm.invoke(messages)
         
+        # Merge target channels and extracted parameters to avoid overwriting API inputs
+        final_channels = state.get("target_channels") or []
+        if routing_result.target_channels:
+            final_channels = list(set(final_channels + routing_result.target_channels))
+            
+        final_params = state.get("extracted_parameters") or {}
+        if routing_result.extracted_parameters:
+            final_params.update(routing_result.extracted_parameters)
+            
         # Return the partial state update dictionary. 
         # LangGraph will automatically merge these keys into the full AgentGraphState.
         return {
             "user_intent": routing_result.user_intent,
-            "target_channels": routing_result.target_channels,
-            "extracted_parameters": routing_result.extracted_parameters,
+            "target_channels": final_channels,
+            "extracted_parameters": final_params,
             "raw_user_query": query
         }
 

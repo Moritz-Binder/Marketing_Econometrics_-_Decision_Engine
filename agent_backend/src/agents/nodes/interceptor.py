@@ -78,6 +78,53 @@ class FallacyInterceptorNode:
                     "capital_at_risk_eur": float(v_max * 0.3)
                 })
                 
+        optimization_results = None
+        if intent == "BUDGET_OPTIMIZATION":
+            extracted = state.get("extracted_parameters", {})
+            total_budget = extracted.get("total_budget_eur") if extracted else None
+            
+            if total_budget:
+                opt_res = self.budget_optimizer.optimize_allocation(total_budget=total_budget)
+                
+                allocs = []
+                for ch, rec_spend in opt_res["allocations"].items():
+                    # Check if this channel was targeted (if specific targets were given)
+                    if channels and ch not in channels:
+                        continue
+                        
+                    ch_data = summary_df[summary_df["channel"] == ch]
+                    curr_spend = float(ch_data.iloc[0]["total_spend"] / 156.0) if not ch_data.empty else 0.0
+                    hist_aroas = float(ch_data.iloc[0]["aroas"]) if not ch_data.empty else 0.0
+                    
+                    params = self.budget_optimizer.channel_params.get(ch, {})
+                    if params:
+                        mroas = HillSaturationModel.marginal_roas(rec_spend, params["v_max"], params["k"], params["n"])
+                        if rec_spend < params["k"] * 0.8:
+                            sat = "Under-saturated"
+                        elif rec_spend > params["k"] * 1.2:
+                            sat = "Over-saturated"
+                        else:
+                            sat = "Optimal"
+                    else:
+                        mroas = 0.0
+                        sat = "Optimal"
+                        
+                    allocs.append({
+                        "channel": ch,
+                        "current_spend_eur": curr_spend,
+                        "recommended_spend_eur": float(rec_spend),
+                        "expected_mroas": float(mroas),
+                        "historical_aroas": hist_aroas,
+                        "saturation_state": sat
+                    })
+                    
+                optimization_results = {
+                    "status": opt_res["status"],
+                    "allocations": allocs,
+                    "expected_revenue": float(opt_res["expected_revenue"])
+                }
+                
         return {
-            "detected_fallacies": detected_fallacies
+            "detected_fallacies": detected_fallacies,
+            "optimization_results": optimization_results
         }

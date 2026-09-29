@@ -6,16 +6,34 @@ from unittest.mock import patch
 # Ensure the src module can be imported when running directly
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from fastapi.testclient import TestClient
-from src.api.main import app
-from src.api.dependencies import get_mede_workflow
-
 def run_evaluations():
     print("Starting MEDE Agentic Pipeline Evaluation...")
     if not os.environ.get("GEMINI_API_KEY"):
-        print("WARNING: GEMINI_API_KEY is not set. The evaluation requires a live LLM connection.")
-        print("Please set GEMINI_API_KEY to run the test suite.")
-        sys.exit(1)
+        # Check if they have a .env file that Pydantic will load
+        env_paths = ["agent_backend/.env", ".env"]
+        for env_path in env_paths:
+            if os.path.exists(env_path):
+                with open(env_path, "r") as f:
+                    for line in f:
+                        if line.startswith("GEMINI_API_KEY"):
+                            os.environ["GEMINI_API_KEY"] = line.split("=", 1)[1].strip().strip('"').strip("'")
+        
+        if not os.environ.get("GEMINI_API_KEY"):
+            print("WARNING: GEMINI_API_KEY is not set. The evaluation requires a live LLM connection.")
+            print("Please set GEMINI_API_KEY in your environment or .env file to run the test suite.")
+            sys.exit(1)
+
+    # Force local path for data engine when running outside Docker
+    if not os.environ.get("GOLD_DATA_PATH"):
+        # We are usually running from the repo root or agent_backend dir
+        if os.path.exists("agent_backend/data/gold/marketing_mix_gold.parquet"):
+            os.environ["GOLD_DATA_PATH"] = "agent_backend/data/gold/marketing_mix_gold.parquet"
+        elif os.path.exists("data/gold/marketing_mix_gold.parquet"):
+            os.environ["GOLD_DATA_PATH"] = "data/gold/marketing_mix_gold.parquet"
+
+    from fastapi.testclient import TestClient
+    from src.api.main import app
+    from src.api.dependencies import get_mede_workflow
 
     # Initialize client to trigger lifespan and telemetry
     client = TestClient(app)

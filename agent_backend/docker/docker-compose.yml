@@ -16,6 +16,19 @@ services:
       # Mount the data folder so the API can read the latest marketing_mix_gold.parquet
       - ../data:/app/data
 
+  frontend_app:
+    build:
+      context: ../../
+      dockerfile: frontend/Dockerfile
+    container_name: mede_frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://fastapi_app:8000/api/v1
+    depends_on:
+      - fastapi_app
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:latest
     container_name: mede_prometheus
@@ -28,13 +41,12 @@ services:
     restart: unless-stopped
     depends_on:
       - fastapi_app
-
   # ---------------------------------------------------------
   # OPTIONAL: LOCAL LANGFUSE OBSERVABILITY STACK
   # ---------------------------------------------------------
   # The default MEDE configuration assumes you are using 
   # Langfuse Cloud (https://cloud.langfuse.com) in your .env.
-  # 
+  #
   # If you prefer to run Langfuse completely locally, uncomment
   # the 'langfuse-server' and 'langfuse-db' services below, and 
   # update your .env to point to:
