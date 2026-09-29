@@ -49,26 +49,30 @@ def append_message(role: str, content: str):
 # -----------------------------------------------------------------------------
 # Action Handlers
 # -----------------------------------------------------------------------------
-def handle_analyze_decision(query: str, total_budget: float = None, channels: list = None):
+def handle_analyze_decision(query: str, total_budget: float = None, channels: list = None) -> bool:
     with st.spinner("Analyzing econometrics and routing intent..."):
         try:
             res = st.session_state.client.analyze_decision(query, total_budget, channels)
-            st.session_state.current_brief = res.get("final_brief", {})
+            # The API returns the ExecutiveDecisionBrief directly
+            st.session_state.current_brief = res
             st.session_state.current_raw_state = res
             
             # Generate assistant response based on verdict
             verdict = st.session_state.current_brief.get("summary_verdict", "Analysis complete.")
             append_message("assistant", verdict)
+            return True
         except Exception as e:
             st.error(f"API Error: {str(e)}")
+            append_message("assistant", f"API Error: {str(e)}")
+            return False
 
-def handle_audit(payload: Dict[str, Any]):
+def handle_audit(payload: Dict[str, Any]) -> bool:
     with st.spinner("Auditing statistical validity..."):
         try:
             res = st.session_state.client.audit_experiment(
                 payload["control_traffic"], payload["variant_traffic"],
                 payload["control_conversions"], payload["variant_conversions"],
-                payload["alpha"], payload["alpha"]
+                0.5, payload["alpha"]
             )
             # We mock a brief here since the direct endpoint doesn't return the full graph state
             verdict = res.get("verdict", "Audit Complete.")
@@ -76,10 +80,13 @@ def handle_audit(payload: Dict[str, Any]):
             
             st.session_state.current_raw_state = {"audit_results": res}
             st.session_state.current_brief = {"summary_verdict": verdict}
+            return True
         except Exception as e:
             st.error(f"API Error: {str(e)}")
+            append_message("assistant", f"API Error: {str(e)}")
+            return False
 
-def handle_calibrate(payload: Dict[str, Any]):
+def handle_calibrate(payload: Dict[str, Any]) -> bool:
     with st.spinner("Running MCMC Sampling (PyMC)..."):
         try:
             res = st.session_state.client.calibrate_channel(
@@ -91,8 +98,11 @@ def handle_calibrate(payload: Dict[str, Any]):
             
             st.session_state.current_raw_state = {"calibration_results": res}
             st.session_state.current_brief = {"summary_verdict": verdict}
+            return True
         except Exception as e:
             st.error(f"API Error: {str(e)}")
+            append_message("assistant", f"API Error: {str(e)}")
+            return False
 
 # -----------------------------------------------------------------------------
 # UI Layout Layout: 2 Columns
@@ -111,8 +121,9 @@ with col_left:
     # Chat Input Trigger
     if prompt := st.chat_input("Ask MEDE to evaluate a budget shift or A/B test..."):
         append_message("user", prompt)
-        handle_analyze_decision(prompt)
-        st.rerun()
+        success = handle_analyze_decision(prompt)
+        if success:
+            st.rerun()
 
     # 2. Executive Brief & Trace
     if st.session_state.current_brief:
@@ -131,12 +142,13 @@ with col_right:
         opt_payload = render_budget_optimization_form()
         if opt_payload["submitted"]:
             append_message("user", f"Run budget optimization for €{opt_payload['total_budget_eur']:,.2f} on {opt_payload['target_channels']}")
-            handle_analyze_decision(
+            success = handle_analyze_decision(
                 query="Optimize my budget", 
                 total_budget=opt_payload["total_budget_eur"], 
                 channels=opt_payload["target_channels"]
             )
-            st.rerun()
+            if success:
+                st.rerun()
             
         st.divider()
         
@@ -144,8 +156,9 @@ with col_right:
         audit_payload = render_experiment_audit_form()
         if audit_payload["submitted"]:
             append_message("user", f"Audit A/B Test (Control: {audit_payload['control_conversions']}/{audit_payload['control_traffic']})")
-            handle_audit(audit_payload)
-            st.rerun()
+            success = handle_audit(audit_payload)
+            if success:
+                st.rerun()
             
         st.divider()
         
@@ -153,8 +166,9 @@ with col_right:
         calib_payload = render_calibration_form()
         if calib_payload["submitted"]:
             append_message("user", f"Calibrate {calib_payload['channel']} MMM Prior with new experiment data.")
-            handle_calibrate(calib_payload)
-            st.rerun()
+            success = handle_calibrate(calib_payload)
+            if success:
+                st.rerun()
 
     with tab_charts:
         raw_state = st.session_state.current_raw_state
