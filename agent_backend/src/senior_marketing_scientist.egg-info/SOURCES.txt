@@ -1,0 +1,8 @@
+pyproject.toml
+src/__init__.py
+src/core/__init__.py
+src/senior_marketing_scientist.egg-info/PKG-INFO
+src/senior_marketing_scientist.egg-info/SOURCES.txt
+src/senior_marketing_scientist.egg-info/dependency_links.txt
+src/senior_marketing_scientist.egg-info/requires.txt
+src/senior_marketing_scientist.egg-info/top_level.txt

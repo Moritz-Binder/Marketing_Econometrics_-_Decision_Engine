@@ -1,0 +1,37 @@
+name: MEDE Evaluation Benchmark
+
+on:
+  # Allows manual triggering from the GitHub Actions UI
+  workflow_dispatch:
+  # Run automatically on pull requests to main
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: agent_backend
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        
+    - name: Run LLM Benchmark Evaluations
+      env:
+        # Requires the GEMINI_API_KEY secret to be configured in GitHub Settings -> Secrets
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        python evaluations/run_evals.py
