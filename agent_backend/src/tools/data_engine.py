@@ -65,6 +65,19 @@ class DuckDBDataEngine:
         """
         self.parquet_path = parquet_path
         self.conn = duckdb.connect(database=':memory:')
+        
+        # Enable HTTPFS for cloud object storage support
+        self.conn.execute("INSTALL httpfs;")
+        self.conn.execute("LOAD httpfs;")
+        
+        # If reading from GCS, create a secret using Application Default Credentials (ADC)
+        # This works automatically in Cloud Run or local environments with `gcloud auth application-default login`
+        if self.parquet_path.startswith("gs://"):
+            try:
+                self.conn.execute("CREATE SECRET gcs_secret (TYPE GCS, PROVIDER ADC);")
+            except Exception as e:
+                print(f"Warning: Failed to create DuckDB GCS ADC secret: {e}")
+                
         # Create a view so we can query it easily
         self.conn.execute(f"CREATE VIEW gold_data AS SELECT * FROM read_parquet('{self.parquet_path}')")
         
