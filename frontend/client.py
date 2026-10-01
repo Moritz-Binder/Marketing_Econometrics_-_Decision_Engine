@@ -9,6 +9,8 @@ class MEDEClient:
     def __init__(self, base_url: Optional[str] = None):
         self.base_url = base_url or os.environ.get("API_BASE_URL", "http://localhost:8000/api/v1")
         self.timeout = 30.0
+        self.api_key = os.environ.get("API_KEY_SECRET", "mede-local-dev-key")
+        self.headers = {"X-API-Key": self.api_key}
 
     def check_health(self) -> bool:
         """Ping the health endpoint (which is at the root level)."""
@@ -34,7 +36,7 @@ class MEDEClient:
         if target_channels is not None:
             payload["target_channels"] = target_channels
 
-        with httpx.Client(timeout=self.timeout) as client:
+        with httpx.Client(timeout=self.timeout, headers=self.headers) as client:
             response = client.post(f"{self.base_url}/analyze", json=payload)
             response.raise_for_status()
             return response.json()
@@ -57,7 +59,7 @@ class MEDEClient:
             "planned_control_ratio": planned_control_ratio,
             "alpha": alpha
         }
-        with httpx.Client(timeout=self.timeout) as client:
+        with httpx.Client(timeout=self.timeout, headers=self.headers) as client:
             response = client.post(f"{self.base_url}/audit-experiment", json=payload)
             response.raise_for_status()
             return response.json()
@@ -78,7 +80,7 @@ class MEDEClient:
             "experiment_lift_mean": experiment_lift_mean,
             "experiment_lift_se": experiment_lift_se
         }
-        with httpx.Client(timeout=self.timeout) as client:
+        with httpx.Client(timeout=self.timeout, headers=self.headers) as client:
             response = client.post(f"{self.base_url}/calibrate", json=payload)
             response.raise_for_status()
             return response.json()

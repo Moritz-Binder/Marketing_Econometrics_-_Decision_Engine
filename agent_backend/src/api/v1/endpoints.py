@@ -10,7 +10,8 @@ from src.api.v1.schemas import (
 from src.api.dependencies import (
     get_mede_workflow,
     get_experiment_auditor,
-    get_bayesian_calibrator
+    get_bayesian_calibrator,
+    verify_api_key
 )
 from src.agents.graph import MEDEAgentWorkflow
 from src.tools.experimentation import ExperimentAuditor
@@ -21,7 +22,8 @@ router = APIRouter()
 @router.post("/analyze", response_model=ExecutiveDecisionBrief, status_code=status.HTTP_200_OK)
 def analyze_decision(
     request: AnalyzeDecisionRequest,
-    workflow: MEDEAgentWorkflow = Depends(get_mede_workflow)
+    workflow: MEDEAgentWorkflow = Depends(get_mede_workflow),
+    api_key: str = Depends(verify_api_key)
 ) -> ExecutiveDecisionBrief:
     try:
         # Initialize graph state
@@ -50,7 +52,8 @@ def analyze_decision(
 @router.post("/audit-experiment", response_model=ExperimentAuditResponse, status_code=status.HTTP_200_OK)
 def audit_experiment(
     request: ExperimentAuditRequest,
-    auditor: ExperimentAuditor = Depends(get_experiment_auditor)
+    auditor: ExperimentAuditor = Depends(get_experiment_auditor),
+    api_key: str = Depends(verify_api_key)
 ) -> ExperimentAuditResponse:
     try:
         # 1. Check for Sample Ratio Mismatch (SRM)
@@ -102,7 +105,8 @@ def audit_experiment(
 @router.post("/calibrate", response_model=CalibrationResponse, status_code=status.HTTP_200_OK)
 def calibrate_channel(
     request: CalibrationRequest,
-    calibrator: BayesianLiftCalibrator = Depends(get_bayesian_calibrator)
+    calibrator: BayesianLiftCalibrator = Depends(get_bayesian_calibrator),
+    api_key: str = Depends(verify_api_key)
 ) -> CalibrationResponse:
     try:
         result = calibrator.calibrate_channel_prior(

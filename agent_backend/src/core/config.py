@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str
     ROUTER_MODEL: str = "gemini-1.5-flash"
     REASONING_MODEL: str = "gemini-1.5-pro"
+    
+    # Security
+    API_KEY_SECRET: str = "mede-local-dev-key"
 
     # Data
     GOLD_DATA_PATH: str = "/app/data/gold/marketing_mix_gold.parquet"
