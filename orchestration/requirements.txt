@@ -1,0 +1,6 @@
+dagster
+dagster-webserver
+pandas
+pyarrow
+fastparquet
+google-cloud-storage
