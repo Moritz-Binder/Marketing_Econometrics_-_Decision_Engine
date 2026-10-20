@@ -10,7 +10,7 @@
 
 **MEDE** is an enterprise-grade autonomous econometric guardrail and capital allocation platform designed for Tier-1 FMCG marketing leadership (e.g., Procter & Gamble, Unilever, L'Oréal).
 
-Built by AI Engineers and Marketing Econometricians, MEDE solves the critical failure mode of enterprise generative AI: **Zero Hallucinated Arithmetic**. Large Language Models never compute mathematical, statistical, or financial operations. Instead, LLMs strictly classify commercial intent and synthesize deterministic, mathematically proven outputs into executive decision briefs.
+Built by an AI Engineer and Marketing Scientist, MEDE solves the critical failure mode of enterprise generative AI: **Zero Hallucinated Arithmetic**. Large Language Models never compute mathematical, statistical, or financial operations. Instead, LLMs strictly classify commercial intent and synthesize deterministic, mathematically proven outputs into executive decision briefs.
 
 ---
 
@@ -73,9 +73,6 @@ graph TD
 ```text
 senior_marketing_scientist/
 ├── README.md                      # Master Platform Overview (You are here)
-├── AGENTS.md                      # Backend Implementation Specification
-├── AGENTS_FRONTEND.md             # Frontend Implementation Specification
-├── checklist.md                   # Full TDD Build & Verification State
 ├── LICENSE                        # MIT License
 ├── .github/
 │   └── workflows/
