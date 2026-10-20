@@ -32,38 +32,38 @@ MEDE pairs an autonomous **LangGraph multi-agent cognitive architecture** with h
 ```mermaid
 graph TD
     subgraph Presentation ["Presentation Layer (frontend/)"]
-        User([Marketing Executive / CMO]) -->|Commercial Query / Budget Shifts| UI[Streamlit Co-Pilot Workspace :8501]
-        UI -->|Typed HTTP API Calls + X-API-Key| Client[MEDEClient httpx]
+        User([Marketing Executive / CMO]) -->|"Commercial Query / Budget Shifts"| UI["Streamlit Co-Pilot Workspace (:8501)"]
+        UI -->|"Typed HTTP API Calls + X-API-Key"| Client["MEDEClient (httpx)"]
     end
 
     subgraph ServiceLayer ["API & Security Gateway (agent_backend/)"]
-        Client -->|POST /api/v1/analyze| API[FastAPI Gateway :8000]
-        API -->|API Key Verification| Auth[verify_api_key]
-        Auth --> Lifespan[Dependency Container / Pre-warmed Engine]
+        Client -->|"POST /api/v1/analyze"| API["FastAPI Gateway (:8000)"]
+        API -->|"API Key Verification"| Auth[verify_api_key]
+        Auth --> Lifespan["Dependency Container / Pre-warmed Engine"]
     end
 
     subgraph CognitiveGraph ["LangGraph Multi-Agent Engine"]
-        Lifespan --> Supervisor[Supervisor Node<br>Gemini 1.5 Flash<br>Structured Intent Classifier]
+        Lifespan --> Supervisor["Supervisor Node<br>Gemini 1.5 Flash<br>Structured Intent Classifier"]
         
-        Supervisor -->|BUDGET_OPTIMIZATION | FALLACY_CHECK| Interceptor[Fallacy Interceptor Node]
-        Supervisor -->|AUDIT_EXPERIMENT | CALIBRATION| Auditor[Causal Auditor Node]
+        Supervisor -->|"BUDGET_OPTIMIZATION or FALLACY_CHECK"| Interceptor["Fallacy Interceptor Node"]
+        Supervisor -->|"AUDIT_EXPERIMENT or CALIBRATION"| Auditor["Causal Auditor Node"]
         
-        Interceptor --> Synthesizer[Synthesizer Node<br>Gemini 1.5 Pro<br>Executive Decision Brief]
+        Interceptor --> Synthesizer["Synthesizer Node<br>Gemini 1.5 Pro<br>Executive Decision Brief"]
         Auditor --> Synthesizer
     end
 
     subgraph DeterministicCore ["Deterministic Scientific Engines (Zero Hallucination)"]
-        Interceptor <--> DuckDB[DuckDB OLAP Engine<br>Out-of-Core Parquet / GCS httpfs]
-        Interceptor <--> Optimizer[SciPy SLSQP Optimizer<br>Hill Diminishing Returns]
+        Interceptor <--> DuckDB["DuckDB OLAP Engine<br>Out-of-Core Parquet / GCS httpfs"]
+        Interceptor <--> Optimizer["SciPy SLSQP Optimizer<br>Hill Diminishing Returns"]
         
-        Auditor <--> ExpAuditor[Experiment Auditor<br>Pearson Chi-Square SRM & Power]
-        Auditor <--> PyMC[Bayesian Lift Calibrator<br>PyMC MCMC & ArviZ HDI]
-        Auditor <--> GeoAuditor[GeoExperiment Auditor<br>Synthetic Control Null Drift & MDE]
+        Auditor <--> ExpAuditor["Experiment Auditor<br>Pearson Chi-Square SRM & Power"]
+        Auditor <--> PyMC["Bayesian Lift Calibrator<br>PyMC MCMC & ArviZ HDI"]
+        Auditor <--> GeoAuditor["GeoExperiment Auditor<br>Synthetic Control Null Drift & MDE"]
     end
 
-    Synthesizer -->|Validated Pydantic Brief| API
-    API -->|JSON Brief & Solver Trace| UI
-    UI -->|Interactive Saturation Curves & Distributions| User
+    Synthesizer -->|"Validated Pydantic Brief"| API
+    API -->|"JSON Brief & Solver Trace"| UI
+    UI -->|"Interactive Saturation Curves & Distributions"| User
 ```
 
 ---

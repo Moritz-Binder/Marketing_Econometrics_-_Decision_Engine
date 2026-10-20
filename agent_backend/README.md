@@ -24,28 +24,28 @@ In mission-critical enterprise marketing budget decisions, LLMs cannot be truste
 
 ```mermaid
 graph TD
-    User([Client / Streamlit UI]) -->|HTTP POST + X-API-Key| Gateway[FastAPI Gateway :8000]
+    User([Client / Streamlit UI]) -->|"HTTP POST + X-API-Key"| Gateway["FastAPI Gateway (:8000)"]
     Gateway --> Auth[verify_api_key Dependency]
     
     subgraph DirectEndpoints ["Direct Deterministic Endpoints"]
-        Auth -->|POST /audit-experiment| ExpAuditor[Experiment Auditor]
-        Auth -->|POST /calibrate| PyMC[Bayesian Calibrator]
+        Auth -->|"POST /audit-experiment"| ExpAuditor[Experiment Auditor]
+        Auth -->|"POST /calibrate"| PyMC[Bayesian Calibrator]
     end
     
     subgraph CognitivePipeline ["LangGraph Execution Pipeline"]
-        Auth -->|POST /analyze| Supervisor[Supervisor Node<br>Gemini 1.5 Flash<br>Structured Intent Classifier]
+        Auth -->|"POST /analyze"| Supervisor["Supervisor Node<br>Gemini 1.5 Flash<br>Structured Intent Classifier"]
         
-        Supervisor -->|BUDGET_OPTIMIZATION | FALLACY_CHECK| Interceptor[Fallacy Interceptor Node]
-        Supervisor -->|AUDIT_EXPERIMENT | CALIBRATION| Auditor[Causal Auditor Node]
+        Supervisor -->|"BUDGET_OPTIMIZATION or FALLACY_CHECK"| Interceptor["Fallacy Interceptor Node"]
+        Supervisor -->|"AUDIT_EXPERIMENT or CALIBRATION"| Auditor["Causal Auditor Node"]
         
-        Interceptor <--> DuckDB[DuckDB OLAP Engine<br>Out-of-Core Parquet / GCS httpfs]
-        Interceptor <--> Optimizer[SciPy SLSQP Optimizer<br>Hill Non-Linear Curve]
+        Interceptor <--> DuckDB["DuckDB OLAP Engine<br>Out-of-Core Parquet / GCS httpfs"]
+        Interceptor <--> Optimizer["SciPy SLSQP Optimizer<br>Hill Non-Linear Curve"]
         
         Auditor <--> ExpAuditor
         Auditor <--> PyMC
-        Auditor <--> GeoAuditor[GeoExperiment Auditor<br>Synthetic Control Null Drift]
+        Auditor <--> GeoAuditor["GeoExperiment Auditor<br>Synthetic Control Null Drift"]
         
-        Interceptor --> Synthesizer[Synthesizer Node<br>Gemini 1.5 Pro]
+        Interceptor --> Synthesizer["Synthesizer Node<br>Gemini 1.5 Pro"]
         Auditor --> Synthesizer
         Synthesizer --> Brief[ExecutiveDecisionBrief]
     end
